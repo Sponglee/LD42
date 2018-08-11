@@ -5,10 +5,13 @@ using UnityEngine;
 public class FunctionHandler : Singleton<FunctionHandler>
 {
 
-    public GameObject menuWindow;
     public GameObject driveMenu;
     public GameObject folderMenu;
+    public GameObject binMenu;
 
+    public GameObject menuWindow;
+    public GameObject folderWindow;
+    public GameObject compWindow;
 
     //Open MainMenu
     public void OpenMenu()
@@ -21,7 +24,26 @@ public class FunctionHandler : Singleton<FunctionHandler>
             Time.timeScale = 1;
     }
 
-  
+    //Open window
+    public void OpenWindow(string name)
+    {
+        GameObject context = null;
+
+        if (name == "FolderWindow")
+        {
+            context = folderWindow;
+        }
+        else if (name == "MyComputerWindow")
+        {
+            context = compWindow;
+        }
+
+
+        if (context != null)
+        {
+            context.SetActive(true);
+        }
+    }
     //Open contextMenu
     public void OpenContext(string name)
     {
@@ -35,6 +57,10 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             context = folderMenu;
         }
+        else if (name == "Bin")
+        {
+            context = binMenu;
+        }
 
         CloseAllContexts();
 
@@ -46,11 +72,19 @@ public class FunctionHandler : Singleton<FunctionHandler>
        
     }
 
+    //Close clicked winow
+    public void CloseWindow(GameObject window)
+    {
+        CloseAllContexts();
+        window.SetActive(false);
+    }
+
     //Close all menus that are open
     public void CloseAllContexts()
     {
         driveMenu.SetActive(false);
         folderMenu.SetActive(false);
+        binMenu.SetActive(false);
     }
 
 
@@ -64,13 +98,36 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             case "FlashDrive":
                 if(clickIndex == 1)
+                {
+                    CloseAllContexts();
                     OpenContext("FlashDrive");
+                }
+                break;
+            case "LocalDrive":
+                if (clickIndex == 0)
+                {
+                    CloseAllContexts();
+                    OpenWindow("FolderWindow");
+                }
                 break;
             case "Folder":
                 if (clickIndex == 1)
+                {
+                    CloseAllContexts();
                     OpenContext("Folder");
+                }
                 break;
-           
+            case "Bin":
+                if (clickIndex == 1)
+                    OpenContext("Bin");
+                break;
+            case "Computer":
+                if (clickIndex == 0)
+                {
+                    CloseAllContexts();
+                    OpenWindow("MyComputerWindow");
+                }
+                break;
             default:
                 CloseAllContexts();
                 break;
