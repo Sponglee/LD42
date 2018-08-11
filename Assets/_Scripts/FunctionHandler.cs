@@ -87,12 +87,17 @@ public class FunctionHandler : Singleton<FunctionHandler>
         binMenu.SetActive(false);
     }
 
+    //Close Virus window
+    public void CloseVirus(GameObject clickObj)
+    {
+        Destroy(clickObj);
+    }
 
     //Handling clicks on any clickable object
     //Click index 1- rightclick 0-leftclick
-    public void ClickHandler(string name, int clickIndex)
+    public void ClickHandler(GameObject clickObj, int clickIndex)
     {
-       
+        name = clickObj.name;
 
         switch (name)
         {
@@ -126,6 +131,14 @@ public class FunctionHandler : Singleton<FunctionHandler>
                 {
                     CloseAllContexts();
                     OpenWindow("MyComputerWindow");
+                }
+                break;
+            case "Virus(Clone)":
+                if (clickIndex == 1)
+                {
+                    Debug.Log(clickObj.name);
+                    CloseAllContexts();
+                    CloseVirus(clickObj);
                 }
                 break;
             default:
