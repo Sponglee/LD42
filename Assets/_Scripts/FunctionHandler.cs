@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FunctionHandler : Singleton<FunctionHandler>
 {
@@ -13,6 +14,33 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public GameObject folderWindow;
     public GameObject compWindow;
 
+    public GameObject errorWindowPref;
+
+
+    public GameObject flashDrive;
+
+    //Offset for stacking errorMessages
+    private int windowOffset = 0;
+
+
+    //Show Error Message
+    public void ShowError(string errorText, int times=1)
+    {
+        
+        for (int i = 0; i < times; i++)
+        {
+            if (windowOffset >= 250)
+                windowOffset = 0;
+
+            Vector3 errorSpawnPos = new Vector3(GameManager.Instance.errorHolder.position.x + windowOffset, GameManager.Instance.errorHolder.position.y + windowOffset);
+            Instantiate(errorWindowPref, errorSpawnPos, Quaternion.identity, GameManager.Instance.errorHolder);
+            errorWindowPref.transform.GetChild(0).GetComponentInChildren<Text>().text = errorText;
+            //Move next window a bit
+            windowOffset += 50;
+
+        }
+        GameManager.Instance.errorShown = false;
+    }
     //Open MainMenu
     public void OpenMenu()
     {
@@ -93,12 +121,30 @@ public class FunctionHandler : Singleton<FunctionHandler>
         Destroy(clickObj);
     }
 
+    //Handling Flash Eject Button
+
+    public void EjectFlash()
+    {
+        StartCoroutine(StopEject());
+    }
+
+    public IEnumerator StopEject()
+    {
+        flashDrive.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
+        GameManager.Instance.FlashSpace = 0;
+        flashDrive.SetActive(true);
+    }
+
+
+
     //Handling clicks on any clickable object
     //Click index 1- rightclick 0-leftclick
     public void ClickHandler(GameObject clickObj, int clickIndex)
     {
         name = clickObj.name;
 
+        //Chose how to interact on a click
         switch (name)
         {
             case "FlashDrive":
@@ -139,6 +185,15 @@ public class FunctionHandler : Singleton<FunctionHandler>
                     Debug.Log(clickObj.name);
                     CloseAllContexts();
                     CloseVirus(clickObj);
+                }
+                break;
+            case "CloseWindow":
+                if (clickIndex == 0)
+                {
+                    CloseAllContexts();
+                    //Get window from a button click and reset Error Toggle
+                    GameManager.Instance.errorShown = false;
+                    Destroy(clickObj.transform.parent.parent.gameObject);
                 }
                 break;
             default:

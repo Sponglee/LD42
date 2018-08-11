@@ -37,7 +37,7 @@ public class Download : MonoBehaviour {
         if (gameObject.name != "Virus")
             dwnldble.isVirus = false;  
         
-        dwnldble.downloadSpeed = Random.Range(1f, 10f);
+        dwnldble.downloadSpeed = Random.Range(dwnldble.size / 10, dwnldble.size/3);
         StartCoroutine(StartDownload());
 
 	}
@@ -47,14 +47,15 @@ public class Download : MonoBehaviour {
         while(dwnldble.progress<=dwnldble.size)
         {
             dwnldble.progress += dwnldble.downloadSpeed;
+            GameManager.Instance.ProgressChecker += dwnldble.downloadSpeed;
             slider.value = dwnldble.progress / dwnldble.size;
             yield return new WaitForSeconds(1);
         }
 
-        if(gameObject.CompareTag("Virus"))
+        if(gameObject.CompareTag("Virus") && !GameManager.Instance.GameOver)
         {
-            GameManager.Instance.GameOver = true;
             GameManager.Instance.BannerCheck = true;
+            GameManager.Instance.GameOver = true;
         }
 
         Destroy(gameObject);

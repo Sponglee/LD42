@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Downloadable
   - Virus
+  - errorText
   layers:
   - Default
   - TransparentFX
