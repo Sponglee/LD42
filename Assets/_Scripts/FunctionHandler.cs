@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class FunctionHandler : Singleton<FunctionHandler>
 {
+   
 
     public GameObject driveMenu;
     public GameObject folderMenu;
@@ -13,7 +14,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public GameObject menuWindow;
     public GameObject folderWindow;
     public GameObject compWindow;
-
+    public GameObject irqWindow;
     public GameObject errorWindowPref;
 
 
@@ -39,6 +40,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
             windowOffset += 50;
 
         }
+       
         GameManager.Instance.errorShown = false;
     }
     //Open MainMenu
@@ -65,7 +67,11 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             context = compWindow;
         }
-
+        if (name == "IrqHandler")
+        {
+            context = irqWindow;
+            GameManager.Instance.irqOpen = true;
+        }
 
         if (context != null)
         {
@@ -89,6 +95,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             context = binMenu;
         }
+       
 
         CloseAllContexts();
 
@@ -104,6 +111,11 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public void CloseWindow(GameObject window)
     {
         CloseAllContexts();
+        //If dealing with IrQ window - toggle gameManager bool
+        if(window.name == "IrqHandler")
+        {
+            GameManager.Instance.irqOpen = false;
+        }
         window.SetActive(false);
     }
 
@@ -125,6 +137,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
 
     public void EjectFlash()
     {
+        CloseAllContexts();
         StartCoroutine(StopEject());
     }
 
@@ -191,9 +204,14 @@ public class FunctionHandler : Singleton<FunctionHandler>
                 if (clickIndex == 0)
                 {
                     CloseAllContexts();
-                    //Get window from a button click and reset Error Toggle
-                    GameManager.Instance.errorShown = false;
                     Destroy(clickObj.transform.parent.parent.gameObject);
+                }
+                break;
+            case "Irq":
+                if (clickIndex == 0)
+                {
+                    CloseAllContexts();
+                    OpenWindow("IrqHandler");
                 }
                 break;
             default:

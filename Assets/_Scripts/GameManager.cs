@@ -5,6 +5,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
+//Chat class
+[System.Serializable]
+public class Message
+{
+    public string text;
+    public Text textObject;
+    public string timeStamp;
+}
+
 public class GameManager : Singleton<GameManager> {
 
     //current size of a disk
@@ -35,6 +45,10 @@ public class GameManager : Singleton<GameManager> {
         set
         {
             flashSpace = value;
+          
+           //reset Error Toggle
+            if (flashSpace<flashSize)
+                GameManager.Instance.errorShown = false;
             flashSlider.value = FlashSpace / flashSize;
         }
     }
@@ -98,6 +112,9 @@ public class GameManager : Singleton<GameManager> {
     //Reference for window and error pop ups
     public Transform errorHolder;
 
+    //Time in tray
+    public Text timeTray;
+
     //errorTracking bool 
     public bool errorShown = false;
 
@@ -157,16 +174,31 @@ public class GameManager : Singleton<GameManager> {
 
     //Chat handler
     public string chatPref;
-    
+
+    public GameObject chatPanel;
+    public GameObject textObject;
+    public InputField chatBox;
+
     public bool irqOpen = false;
     [SerializeField]
     List<Message> messageList = new List<Message>();
 
-    [System.Serializable]
-    public class Message
+ 
+    //Chat function
+    public void SendMessageToChat(string text)
     {
-        public string text;
+        Message newMessage = new Message();
+        newMessage.text = text;
+
+        GameObject newText = Instantiate(textObject, chatPanel.transform);
+
+        newMessage.textObject = newText.GetComponent<Text>();
+        newMessage.textObject.text = newMessage.text;
+
+        messageList.Add(newMessage);
     }
+
+
 
     public void Start()
     {
@@ -182,7 +214,11 @@ public class GameManager : Singleton<GameManager> {
 
     public void Update()
     {
-        if(GameOver && DeathScreenCheck)
+        //Grab time
+        timeTray.text = System.DateTime.Now.ToString("hh:mm");
+
+        //Death screen reset anykey
+        if (GameOver && DeathScreenCheck)
         {
             if(Input.anyKeyDown)
             {
@@ -194,15 +230,26 @@ public class GameManager : Singleton<GameManager> {
             }
         }
 
-        if(irqOpen)
+        //Chat window
+        if (irqOpen)
         {
-            if(Input.anyKeyDown)
+            if (chatBox.text != "")
             {
-                if (Input.GetMouseButtonDown(0)
-                || Input.GetMouseButtonDown(1)
-                || Input.GetMouseButtonDown(2))
-                    return; //Do Nothing
-                SendMessageToChat("Chat string");
+                //Activate input on any buttonclick
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    SendMessageToChat("  <color=red><b>[" + System.DateTime.Now.ToString("hh:mm") +"] mEgAPiRate777:</b></color> " + chatBox.text);
+                    chatBox.text = "";
+                }
+            }
+            else
+            {
+                if (!chatBox.isFocused && Input.anyKeyDown)
+                {
+                    if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2))
+                        return; //Do Nothing
+                    chatBox.ActivateInputField();
+                }
             }
         }
     }
@@ -238,10 +285,4 @@ public class GameManager : Singleton<GameManager> {
 
 
 
-    public void SendMessageToChat(string text)
-    {
-        Message newMessage = new Message();
-        newMessage.text = text;
-        messageList.Add(newMessage);
-    }
 }
