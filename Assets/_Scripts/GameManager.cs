@@ -111,8 +111,8 @@ public class GameManager : Singleton<GameManager> {
             }
             else
             {
-                if(!errorShown)
-                    FunctionHandler.Instance.ShowError("Not enough space on usb Flash Drive! Please remove");
+                StartCoroutine(PlotManager.Instance.StopBlink(PlotManager.Instance.folderImage));
+           
                 errorShown = true;
                 //Add to system disk if flash is full
                 if (SystemSpace < systemSize)
@@ -133,7 +133,9 @@ public class GameManager : Singleton<GameManager> {
         }
     }
 
-   
+    //Temp Clear in progress
+    public bool clearTempProgress = false;
+
     //Reference for window and error pop ups
     public Transform errorHolder;
 
@@ -295,7 +297,7 @@ public class GameManager : Singleton<GameManager> {
         flashSlider.value = FlashSpace / flashSize;
         
         downloads = new Stack<GameObject>();
-
+      
         //Activate plot manager sequence
         StartCoroutine(StartPlot());
 
@@ -312,8 +314,9 @@ public class GameManager : Singleton<GameManager> {
         timeTray.text = System.DateTime.Now.ToString("hh:mm");
 
         //Death screen reset anykey
-        if (GameOver && DeathScreenCheck)
+        if (GameOver)
         {
+            StopAllCoroutines();
             if(Input.anyKeyDown)
             {
                 if (Input.GetMouseButtonDown(0)
@@ -397,7 +400,7 @@ public class GameManager : Singleton<GameManager> {
         yield return new WaitForSeconds(1f);
         if (PlayerPrefs.GetInt("PlotStep", 0) < PlotManager.Instance.plotMessages.Length)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 6; i++)
             {
                 PlotManager.Instance.plotTrigger.Invoke();
                 yield return new WaitForSeconds(Random.Range(1f,3f));

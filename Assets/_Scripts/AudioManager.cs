@@ -102,8 +102,22 @@ public class AudioManager : Singleton<AudioManager>
         Debug.Log("AudioManager: no sounds like that " + _name);
     }
 
-    //Change volume while keeping seperate volume levels
-    public void VolumeChange (float value)
+
+
+    //Stopsounds
+    public void StopSound(string _name, bool solo = false)
+    {
+        for (int i = 0; i < sounds.Length; i++)
+        {
+            if (sounds[i].name == _name)
+            {
+                sounds[i].Stop();
+            }
+        }
+    }
+
+                    //Change volume while keeping seperate volume levels
+                    public void VolumeChange (float value)
     {
       
         for (int i = 0; i < transform.childCount; i++)

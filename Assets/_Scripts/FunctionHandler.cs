@@ -11,6 +11,8 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public GameObject driveMenu;
     public GameObject folderMenu;
     public GameObject binMenu;
+    public GameObject systemMenu;
+
 
     public GameObject menuWindow;
     public GameObject folderWindow;
@@ -18,6 +20,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public GameObject jetWindow;
     public GameObject irqWindow;
     public GameObject virusHelp;
+    public GameObject stickyWindow;
     public GameObject errorWindowPref;
 
 
@@ -82,7 +85,12 @@ public class FunctionHandler : Singleton<FunctionHandler>
         if (name == "JetGet")
         {
             context = jetWindow;
-          
+            AudioManager.Instance.PlaySound("keygen");
+        }
+        if (name == "StickyNote")
+        {
+            context = stickyWindow;
+
         }
         if (name == "VirusHelp")
         {
@@ -111,7 +119,10 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             context = binMenu;
         }
-       
+        else if (name == "SystemMenu")
+        {
+            context = systemMenu;
+        }
 
         CloseAllContexts();
 
@@ -132,6 +143,10 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             GameManager.Instance.irqOpen = false;
         }
+        else if(window.name == "JetGetHandler")
+        {
+            AudioManager.Instance.StopSound("keygen");
+        }
         window.SetActive(false);
     }
 
@@ -141,6 +156,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
         driveMenu.SetActive(false);
         folderMenu.SetActive(false);
         binMenu.SetActive(false);
+        systemMenu.SetActive(false);
     }
 
     //Close Virus window
@@ -175,19 +191,21 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public void ClearTemp()
     {
         CloseAllContexts();
-        if(GameManager.Instance.SystemSpace>64)
+        if(GameManager.Instance.SystemSpace>64 && !GameManager.Instance.clearTempProgress)
             StartCoroutine(StopTemp());
     }
     //Context Menu clear Temp
     public IEnumerator StopTemp()
     {
+        GameManager.Instance.clearTempProgress = true;
         GameManager.Instance.TrashBinFull = true;
         for (int i = 0; i < 5; i++)
         {
-            GameManager.Instance.SystemSpace -= 1;
-            GameManager.Instance.trashSize += 1;
+            GameManager.Instance.SystemSpace -= 1.5f;
+            GameManager.Instance.trashSize += 1.5f;
             yield return new WaitForSeconds(0.5f);
         }
+        GameManager.Instance.clearTempProgress = false;
     }
 
 
@@ -225,6 +243,8 @@ public class FunctionHandler : Singleton<FunctionHandler>
             jetget.SetActive(true);
         }
         ShowError("JetGet is successfully installed!");
+        OpenWindow("JetGet");
+       
     }
         
 
@@ -242,6 +262,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
     //JetGet Stop
     public void JetStop()
     {
+       
         GameManager.Instance.JetStop();
     }
 
@@ -280,10 +301,21 @@ public class FunctionHandler : Singleton<FunctionHandler>
                     OpenContext("Bin");
                 break;
             case "Computer":
-                if (clickIndex == 0)
+                if (clickIndex == 1)
+                    OpenContext("SystemMenu");
+                else if (clickIndex == 0)
                 {
                     CloseAllContexts();
                     OpenWindow("MyComputerWindow");
+                }
+                break;
+            case "System":
+                if (clickIndex == 1)
+                    OpenContext("SystemMenu");
+                else if (clickIndex == 0)
+                {
+                    CloseAllContexts();
+                    OpenWindow("FolderWindow");
                 }
                 break;
             case "JetGet":
@@ -321,11 +353,18 @@ public class FunctionHandler : Singleton<FunctionHandler>
                     OpenWindow("IrqHandler");
                 }
                 break;
+            case "StickyNote":
+                if (clickIndex == 0)
+                {
+                    CloseAllContexts();
+                    OpenWindow("StickyNote");
+                }
+                break;
             case "FolderIcon":
                 if (clickIndex == 0)
                 {
                     CloseAllContexts();
-                    OpenWindow("FolderWIndow");
+                    OpenWindow("MyComputerWindow");
                 }
                 break;
             case "AntiVirus":
@@ -364,7 +403,13 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public void NewGame()
     {
         PlayerPrefs.DeleteAll();
+        Time.timeScale = 1;
         SceneManager.LoadScene("Intro");
+    }
+    public void Reboot()
+    {
+        Time.timeScale = 1;
+        SceneManager.LoadScene("Boot");
     }
 
     public void Credits()

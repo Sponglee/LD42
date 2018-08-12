@@ -17,6 +17,11 @@ public class PlotManager : Singleton<PlotManager> {
 
 
     public Image irqIcon;
+    public Image virusImage;
+    public Image folderImage;
+    public Image jetGetImage;
+
+
     public Color[] blinkColors;
 
     //plot MEssages
@@ -40,14 +45,15 @@ public class PlotManager : Singleton<PlotManager> {
                "If you really want to be able to pay for your university you gotta accept my offer," +
                "Plus i've got the app already. It' here on my pc and it's gorgeous," +
                "I can send it to you just say the word," +
-               "One moment. Oh and don't let the hard drive fill with junk. Clear temp folder on your system drive by right clicking on it," +
-               "<color=blue>hhtp://trustworthyh@ckers.org/jetget.zip</color>," +            //STEP 8!!!//
+               "What you gonna say?"+
+                "One moment.,"+
+               "<color=blue>hhtp://trustworthyh@ckers.org/jetget.zip</color> Click it.," +            //STEP 8!!!//
                "Did you click the link?,"+
-               "I'll be paying for each flash drive u send me, okay?," +
+               "I'll be paying for each flash drive u send me," +
                "Remember. this thing downloads all fresh releases straight to your flash drive, got it?" +
                "Be aware of viruses though.Right click to dismiss them. Your antivirus should handle the rest," +
-               "Eject flash drive with right mouse button once it's full is that clear?," +
-               "This thing is no joke, don't tell anybody about it!," +
+               "Eject flash drive with right mouse button once it's full," +
+               "Oh and don't let the hard drive fill with junk. Clear temp folder on your system drive by right clicking on it," +
                "GET ME THOSE FLASH DRIVES!";
         plotRawIdle = "Come on," +
                 "Stop fooling around," +
@@ -94,6 +100,7 @@ public class PlotManager : Singleton<PlotManager> {
     
     void Start ()                                                                                                                       //START//
     {
+        StartCoroutine(StopBlink(virusImage));
        
         plotMessages= plotRaw.Split(',');
         plotMessagesIdle = plotRawIdle.Split(',');
@@ -105,12 +112,12 @@ public class PlotManager : Singleton<PlotManager> {
             plotStep = 9;
             FunctionHandler.Instance.DownloadJetGet();
         }
-        
+
     }
 	
 	public void PlotTriggered()
     {
-        if (PlayerPrefs.GetInt("PlotStep", 0) > 8)
+        if (PlayerPrefs.GetInt("PlotStep", 0) > 9)
         {
             foreach(GameObject obj in FunctionHandler.Instance.jetGetObjs)
             {
@@ -125,7 +132,7 @@ public class PlotManager : Singleton<PlotManager> {
     private IEnumerator StopSend()
     {
         yield return new WaitForSeconds(Random.Range(1, 3));
-        StartCoroutine(StopBlink());
+        StartCoroutine(StopBlink(irqIcon));
         plotIndexIdle = PlotRandomiser(plotIndexIdle, plotMessagesIdle.Length);
         if (PlayerPrefs.GetInt("PlotStep", 0) >= plotMessages.Length)
             GameManager.Instance.SendMessageToChat("  <color=blue><b>[" + 
@@ -140,14 +147,14 @@ public class PlotManager : Singleton<PlotManager> {
         StartCoroutine(ChatTimeOut());
     }
 
-    public IEnumerator StopBlink()
+    public IEnumerator StopBlink(Image contextImage)
     {
 
         for (int i = 0; i < 4; i++)
         {
-            irqIcon.color = blinkColors[1];
+            contextImage.color = blinkColors[1];
             yield return new WaitForSeconds(0.5f);
-            irqIcon.color = blinkColors[0];
+            contextImage.color = blinkColors[0];
             yield return new WaitForSeconds(0.2f);
         }
     }
@@ -155,18 +162,23 @@ public class PlotManager : Singleton<PlotManager> {
     public IEnumerator ChatTimeOut()
     {
         int plotCurrentStep = plotStep;
-        yield return new WaitForSeconds(Random.Range(10,15));
-        Debug.Log(">>>>>" + PlayerPrefs.GetInt("PlotStep", 0) + " " + plotCurrentStep);
+        if(plotStep>9)
+            yield return new WaitForSeconds(Random.Range(5, 10));
+        else
+            yield return new WaitForSeconds(Random.Range(5 ,7));
+
+    
         plotIndexQuestions = PlotRandomiser(plotIndexQuestions, plotMessagesQuestions.Length);
-        if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) < 8)
+        if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) < 9)
         {
             GameManager.Instance.SendMessageToChat("  <color=blue><b>[" + 
                 System.DateTime.Now.ToString("hh:mm") + "] <RlsMaster>:</b></color> " + 
                     plotMessagesQuestions[plotIndexQuestions]);
-            StartCoroutine(StopBlink());
+            StartCoroutine(StopBlink(irqIcon));
             StartCoroutine(ChatTimeOut());
         }
-         else if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) >= 8)
+         else if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) >= 9
+            && PlayerPrefs.GetInt("PlotStep", 0) < 16)
         {
             plotTrigger.Invoke();
         }
