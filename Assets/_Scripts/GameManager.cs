@@ -18,6 +18,7 @@ public class Message
 public class GameManager : Singleton<GameManager> {
 
     //current size of a disk
+    public Text systemText;
     [SerializeField]
     private float systemSpace;
     public float SystemSpace
@@ -30,9 +31,22 @@ public class GameManager : Singleton<GameManager> {
         set
         {
             systemSpace = value;
+            //Update systemText
+            systemText.text = string.Format("{0}GB free of {1}GB", systemSpace.ToString(), systemSize.ToString());
             systemSlider.value = SystemSpace / systemSize;
+            //Set colors
+            if (systemSlider.value > 0.75f)
+            {
+                systemColor.color = sliderColors[1];
+            }
+            else
+            {
+                systemColor.color = sliderColors[0];
+            }
         }
     }
+    //Flash drive space
+    public Text flashText;
     [SerializeField]
     private float flashSpace;
     public float FlashSpace
@@ -45,11 +59,22 @@ public class GameManager : Singleton<GameManager> {
         set
         {
             flashSpace = value;
-          
-           //reset Error Toggle
+            //Update systemText
+            flashText.text = string.Format("{0}GB free of {1}GB", flashSpace.ToString(), flashSize.ToString());
+
+            //reset Error Toggle
             if (flashSpace<flashSize)
                 GameManager.Instance.errorShown = false;
             flashSlider.value = FlashSpace / flashSize;
+            //Switch color
+            if (flashSlider.value>0.75f)
+            {
+                flashColor.color = sliderColors[1];
+            }
+            else
+            {
+                flashColor.color = sliderColors[0];
+            }
         }
     }
 
@@ -118,6 +143,36 @@ public class GameManager : Singleton<GameManager> {
     //errorTracking bool 
     public bool errorShown = false;
 
+    //Trash bin variables
+    public float trashSize = 0;
+    private bool trashBinFull = false;
+    public Sprite[] trashBinIcons;
+    public Image trashBinIcon;
+
+    public bool TrashBinFull
+    {
+        get
+        {
+            return trashBinFull;
+        }
+
+        set
+        {
+            trashBinFull = value;
+            if(trashBinFull)
+            {
+                //change icon on the desktop
+                trashBinIcon.sprite = trashBinIcons[1];
+            }
+            else
+            {
+                trashBinIcon.sprite = trashBinIcons[0];
+            }
+        }
+    }
+
+
+
     //game over handler with property
     public GameObject deathScreenPref;
     public GameObject bannerPref;
@@ -152,11 +207,33 @@ public class GameManager : Singleton<GameManager> {
         }
     }
 
+    //Goal/money
+    public float goal = 10000;
+    public float flashPrice = 100;
+    public Text moneyText;
+    private float money = 13.77f;
+    public float Money
+    {
+        get
+        {
+            return money;
+        }
+
+        set
+        {
+
+            money = float.Parse(System.Math.Round(value, 2).ToString());
+            moneyText.text = string.Format("{0}/{1}$", money.ToString(), goal.ToString());
+        }
+    }
+
 
     //Ui for disks
     public Slider systemSlider;
     public Slider flashSlider;
-
+    public Color[] sliderColors;
+    public Image flashColor;
+    public Image systemColor;
 
     //Total size of a disk
     public float systemSize;
@@ -166,6 +243,9 @@ public class GameManager : Singleton<GameManager> {
     public Stack<GameObject> downloads;
     public GameObject[] downloadPrefs;
     public Transform downloadHolder;
+
+   
+
 
     //Game Over check
     public bool BannerCheck = false;
@@ -179,11 +259,15 @@ public class GameManager : Singleton<GameManager> {
     public GameObject textObject;
     public InputField chatBox;
 
+    //JEtGet check bool
+    public bool jetStarted;
+    //Irq window open bool
     public bool irqOpen = false;
     [SerializeField]
     List<Message> messageList = new List<Message>();
 
- 
+
+
     //Chat function
     public void SendMessageToChat(string text)
     {
@@ -198,18 +282,28 @@ public class GameManager : Singleton<GameManager> {
         messageList.Add(newMessage);
     }
 
+   
 
-
-    public void Start()
+    public void Start()                                                //START//
     {
-        
+        //Update systemText
+        systemText.text = string.Format("{0}GB free of {1}GB", systemSpace.ToString(),systemSize.ToString());
+        //Update systemText
+        flashText.text = string.Format("{0}GB free of {1}GB", flashSpace.ToString(), flashSize.ToString());
+
         systemSlider.value = SystemSpace / systemSize;
         flashSlider.value = FlashSpace / flashSize;
         
         downloads = new Stack<GameObject>();
 
-        StartCoroutine(SpawnDownloads());
-        
+        //Activate plot manager sequence
+        StartCoroutine(StartPlot());
+
+        //Start storyline if below idle
+
+        //StartCoroutine(SpawnDownloads());
+
+
     }
 
     public void Update()
@@ -226,7 +320,7 @@ public class GameManager : Singleton<GameManager> {
                  || Input.GetMouseButtonDown(1)
                  || Input.GetMouseButtonDown(2))
                     return; //Do Nothing
-                SceneManager.LoadScene("Main");
+                SceneManager.LoadScene("Boot");
             }
         }
 
@@ -239,6 +333,7 @@ public class GameManager : Singleton<GameManager> {
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
                     SendMessageToChat("  <color=red><b>[" + System.DateTime.Now.ToString("hh:mm") +"] mEgAPiRate777:</b></color> " + chatBox.text);
+                    PlotManager.Instance.plotTrigger.Invoke();
                     chatBox.text = "";
                 }
             }
@@ -253,17 +348,32 @@ public class GameManager : Singleton<GameManager> {
             }
         }
     }
+
+    //JetStop handler
+    public void JetStop()
+    {
+        StopCoroutine(SpawnDownloads());
+        jetStarted = false;
+    }
+
+
     public IEnumerator SpawnDownloads()
     {
+        yield return new WaitForSeconds(3f);
+
+
+
+
+
         int virusChance = 0;
-        while(true)
+        while(jetStarted)
         {
             GameObject tmp = null;
             if (downloadHolder.childCount<=8)
             {
 
                 virusChance += Random.Range(0, 10);
-                Debug.Log(virusChance + " :  :  : " + virusChance % 30);
+                //Debug.Log(virusChance + " :  :  : " + virusChance % 30);
                 if(virusChance%10==0)
                 {
                     tmp = downloadPrefs[0];   
@@ -282,6 +392,19 @@ public class GameManager : Singleton<GameManager> {
        
     }
 
+    public IEnumerator StartPlot()
+    {
+        yield return new WaitForSeconds(1f);
+        if (PlayerPrefs.GetInt("PlotStep", 0) < PlotManager.Instance.plotMessages.Length)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                PlotManager.Instance.plotTrigger.Invoke();
+                yield return new WaitForSeconds(Random.Range(1f,3f));
+            }
+        }
+        
+    }
 
 
 

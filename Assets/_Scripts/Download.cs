@@ -33,7 +33,7 @@ public class Download : MonoBehaviour {
     void Start () {
 
         dwnldble.name = "Cat.gif";
-        dwnldble.size = Random.Range(1f, 5000f);
+        dwnldble.size = Random.Range(1f, 8f);
         if (gameObject.name != "Virus")
             dwnldble.isVirus = false;  
         
