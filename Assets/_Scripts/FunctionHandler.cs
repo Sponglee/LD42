@@ -11,9 +11,10 @@ public class FunctionHandler : Singleton<FunctionHandler>
     public GameObject driveMenu;
     public GameObject folderMenu;
     public GameObject binMenu;
+    public GameObject creditsMenu;
     public GameObject systemMenu;
 
-
+    public GameObject helpWindow;
     public GameObject menuWindow;
     public GameObject folderWindow;
     public GameObject compWindow;
@@ -85,7 +86,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
         if (name == "JetGet")
         {
             context = jetWindow;
-            AudioManager.Instance.PlaySound("keygen");
+            //AudioManager.Instance.PlaySound("keygen");
         }
         if (name == "StickyNote")
         {
@@ -97,6 +98,12 @@ public class FunctionHandler : Singleton<FunctionHandler>
             context = virusHelp;
 
         }
+        if (name == "Help")
+        {
+            context = helpWindow;
+
+        }
+
         if (context != null)
         {
             context.SetActive(true);
@@ -123,6 +130,10 @@ public class FunctionHandler : Singleton<FunctionHandler>
         {
             context = systemMenu;
         }
+        else if (name == "Credits")
+        {
+            context = creditsMenu;
+        }
 
         CloseAllContexts();
 
@@ -145,7 +156,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
         }
         else if(window.name == "JetGetHandler")
         {
-            AudioManager.Instance.StopSound("keygen");
+            //AudioManager.Instance.StopSound("keygen");
         }
         window.SetActive(false);
     }
@@ -153,6 +164,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
     //Close all menus that are open
     public void CloseAllContexts()
     {
+        creditsMenu.SetActive(false);
         driveMenu.SetActive(false);
         folderMenu.SetActive(false);
         binMenu.SetActive(false);
@@ -170,7 +182,9 @@ public class FunctionHandler : Singleton<FunctionHandler>
    
     //Handling Flash Eject Button
     public void EjectFlash()
-    {
+    { 
+        //Loading sound
+        AudioManager.Instance.PlaySound("cash");
         CloseAllContexts();
         StartCoroutine(StopEject());
     }
@@ -212,6 +226,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
     //Handling Flash Eject Button
     public void ClearTrash()
     {
+        AudioManager.Instance.PlaySound("trash");
         CloseAllContexts();
         StartCoroutine(StopTrash());
     }
@@ -294,6 +309,13 @@ public class FunctionHandler : Singleton<FunctionHandler>
                 {
                     CloseAllContexts();
                     OpenContext("Folder");
+                }
+                break;
+            case "VirusHelp":
+                if(true)
+                {
+                    CloseAllContexts();
+                    CloseWindow(virusHelp);
                 }
                 break;
             case "Bin":
@@ -421,4 +443,39 @@ public class FunctionHandler : Singleton<FunctionHandler>
     {
         Application.Quit();
     }
+
+    public void OpenBrowser(string url)
+    {
+        CloseAllContexts();
+        Application.OpenURL(url);
+    }
+
+
+    /*VOLUME CONTROLLER*/
+
+    public Sprite volumeIcon;
+    public Sprite volumeMute;
+
+    public GameObject volumeUI;
+
+
+    public void VolumeHandler(float value)
+    {
+        PlayerPrefs.SetFloat("Volume", value);
+        AudioManager.Instance.VolumeChange(value);
+
+        volumeUI = GameObject.FindGameObjectWithTag("volume");
+
+        if (value == 0)
+        {
+            volumeUI.GetComponent<Image>().sprite = volumeMute;
+        }
+        else
+            volumeUI.GetComponent<Image>().sprite = volumeIcon;
+
+    }
+
+
+
+   
 }

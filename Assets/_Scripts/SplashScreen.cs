@@ -26,8 +26,8 @@ public class SplashScreen : MonoBehaviour {
             loadTime = minimumLogoTime;
         else
             loadTime = Time.timeSinceLevelLoad;
-
-
+        if (SceneManager.GetActiveScene().name == "Intro")
+            AudioManager.Instance.PlaySound("startup", true);
 
 
     }

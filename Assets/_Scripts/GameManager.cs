@@ -177,6 +177,7 @@ public class GameManager : Singleton<GameManager> {
 
     //game over handler with property
     public GameObject deathScreenPref;
+    public GameObject winScreenPref;
     public GameObject bannerPref;
     [SerializeField]
     private bool gameOver = false;
@@ -201,6 +202,11 @@ public class GameManager : Singleton<GameManager> {
                 {
                     contextGameOver = deathScreenPref;
                 }
+                else if (WinScreenCheck)
+                {
+                    contextGameOver = deathScreenPref;
+                }
+
 
                 Instantiate(contextGameOver, errorHolder.position, Quaternion.identity, errorHolder);
                
@@ -226,6 +232,11 @@ public class GameManager : Singleton<GameManager> {
 
             money = float.Parse(System.Math.Round(value, 2).ToString());
             moneyText.text = string.Format("{0}/{1}$", money.ToString(), goal.ToString());
+            if(money>goal)
+            {
+                WinScreenCheck = true;
+                GameOver = true;
+            }
         }
     }
 
@@ -252,7 +263,7 @@ public class GameManager : Singleton<GameManager> {
     //Game Over check
     public bool BannerCheck = false;
     public bool DeathScreenCheck = false;
-
+    public bool WinScreenCheck = false;
 
     //Chat handler
     public string chatPref;
@@ -273,6 +284,8 @@ public class GameManager : Singleton<GameManager> {
     //Chat function
     public void SendMessageToChat(string text)
     {
+        //Loading sound
+        AudioManager.Instance.PlaySound("ding");
         Message newMessage = new Message();
         newMessage.text = text;
 
@@ -288,6 +301,8 @@ public class GameManager : Singleton<GameManager> {
 
     public void Start()                                                //START//
     {
+        //Loading sound
+        AudioManager.Instance.PlaySound("OSload");
         //Update systemText
         systemText.text = string.Format("{0}GB free of {1}GB", systemSpace.ToString(),systemSize.ToString());
         //Update systemText
@@ -403,7 +418,7 @@ public class GameManager : Singleton<GameManager> {
             for (int i = 0; i < 6; i++)
             {
                 PlotManager.Instance.plotTrigger.Invoke();
-                yield return new WaitForSeconds(Random.Range(1f,3f));
+                yield return new WaitForSeconds(Random.Range(2f,5f));
             }
         }
         

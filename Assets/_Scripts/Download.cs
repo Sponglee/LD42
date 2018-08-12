@@ -120,18 +120,18 @@ public class Download : MonoBehaviour {
 
         if(gameObject.CompareTag("Virus") && !GameManager.Instance.GameOver)
         {
-            StartCoroutine(StopGameOver());
+            GameManager.Instance.BannerCheck = true;
+            GameManager.Instance.GameOver = true;
         }
 
         Destroy(gameObject);
     }
 	
-    public IEnumerator StopGameOver()
-    {
-        yield return new WaitForSeconds(0.5f);
-        GameManager.Instance.BannerCheck = true;
-        GameManager.Instance.GameOver = true;
-    }
+    //public IEnumerator StopGameOver()
+    //{
+    //    yield return new WaitForSeconds(0.5f);
+       
+    //}
 
 
 

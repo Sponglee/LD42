@@ -45,8 +45,8 @@ public class PlotManager : Singleton<PlotManager> {
                "If you really want to be able to pay for your university you gotta accept my offer," +
                "Plus i've got the app already. It' here on my pc and it's gorgeous," +
                "I can send it to you just say the word," +
-               "What you gonna say?"+
-                "One moment.,"+
+               "Are you in?,"+
+                "Ready?,"+
                "<color=blue>hhtp://trustworthyh@ckers.org/jetget.zip</color> Click it.," +            //STEP 8!!!//
                "Did you click the link?,"+
                "I'll be paying for each flash drive u send me," +
@@ -108,8 +108,8 @@ public class PlotManager : Singleton<PlotManager> {
         plotStep = PlayerPrefs.GetInt("PlotStep", 0);
         if (plotStep >= 8)
         {
-            PlayerPrefs.SetInt("PlotStep",9);
-            plotStep = 9;
+            PlayerPrefs.SetInt("PlotStep",10);
+            plotStep = 10;
             FunctionHandler.Instance.DownloadJetGet();
         }
 
@@ -117,7 +117,7 @@ public class PlotManager : Singleton<PlotManager> {
 	
 	public void PlotTriggered()
     {
-        if (PlayerPrefs.GetInt("PlotStep", 0) > 9)
+        if (PlayerPrefs.GetInt("PlotStep", 0) > 7)
         {
             foreach(GameObject obj in FunctionHandler.Instance.jetGetObjs)
             {
@@ -162,14 +162,14 @@ public class PlotManager : Singleton<PlotManager> {
     public IEnumerator ChatTimeOut()
     {
         int plotCurrentStep = plotStep;
-        if(plotStep>9)
-            yield return new WaitForSeconds(Random.Range(5, 10));
+        if(plotStep>15)
+            yield return new WaitForSeconds(Random.Range(60, 120));
         else
-            yield return new WaitForSeconds(Random.Range(5 ,7));
+            yield return new WaitForSeconds(Random.Range(10 ,15));
 
     
         plotIndexQuestions = PlotRandomiser(plotIndexQuestions, plotMessagesQuestions.Length);
-        if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) < 9)
+        if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && (PlayerPrefs.GetInt("PlotStep", 0) < 8 || PlayerPrefs.GetInt("PlotStep", 0) >15))
         {
             GameManager.Instance.SendMessageToChat("  <color=blue><b>[" + 
                 System.DateTime.Now.ToString("hh:mm") + "] <RlsMaster>:</b></color> " + 
@@ -177,8 +177,8 @@ public class PlotManager : Singleton<PlotManager> {
             StartCoroutine(StopBlink(irqIcon));
             StartCoroutine(ChatTimeOut());
         }
-         else if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) >= 9
-            && PlayerPrefs.GetInt("PlotStep", 0) < 16)
+         else if (PlayerPrefs.GetInt("PlotStep", 0) == plotCurrentStep && PlayerPrefs.GetInt("PlotStep", 0) >= 8
+            && PlayerPrefs.GetInt("PlotStep", 0) <= 15)
         {
             plotTrigger.Invoke();
         }
