@@ -217,7 +217,20 @@ public class GameManager : Singleton<GameManager> {
 
     //Goal/money
     public float goal = 10000;
-    public float flashPrice = 100;
+    private float flashPrice = 100;
+    public float FlashPrice
+    {
+        get
+        {
+            flashPrice = Random.Range(100, 500);
+            return flashPrice;
+        }
+
+        set
+        {
+            flashPrice = value;
+        }
+    }
     public Text moneyText;
     private float money = 13.77f;
     public float Money
@@ -239,6 +252,8 @@ public class GameManager : Singleton<GameManager> {
             }
         }
     }
+
+    
 
 
     //Ui for disks
@@ -301,6 +316,8 @@ public class GameManager : Singleton<GameManager> {
 
     public void Start()                                                //START//
     {
+        goal = Random.Range(5000, 10000);
+        moneyText.text = string.Format("{0}/{1}$", money.ToString(), goal.ToString());
         //Loading sound
         AudioManager.Instance.PlaySound("OSload");
         //Update systemText

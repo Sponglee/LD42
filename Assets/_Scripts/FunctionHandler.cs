@@ -194,7 +194,7 @@ public class FunctionHandler : Singleton<FunctionHandler>
 
         flashDrive.SetActive(false);
         //Get Payment for how full is flash drive
-        GameManager.Instance.Money += GameManager.Instance.flashPrice*GameManager.Instance.FlashSpace/GameManager.Instance.flashSize;
+        GameManager.Instance.Money += GameManager.Instance.FlashPrice*GameManager.Instance.FlashSpace/GameManager.Instance.flashSize;
         yield return new WaitForSeconds(0.5f);
         GameManager.Instance.FlashSpace = 0;
         flashDrive.SetActive(true);
